@@ -69,7 +69,11 @@ public class TripController {
         log.info("Ending trip: {}", id);
         long startTime = System.currentTimeMillis();
         
-        request.setTripId(id);
+        // Set trip ID from path variable if not set in request
+        if (request.getTripId() == null) {
+            request.setTripId(id);
+        }
+        
         Trip trip = tripService.endTrip(request);
         
         long duration = System.currentTimeMillis() - startTime;
@@ -83,6 +87,14 @@ public class TripController {
     @Operation(summary = "Get trip by ID", description = "Retrieves trip details including fare information")
     public ResponseEntity<ApiResponse<Trip>> getTripById(@PathVariable Long id) {
         Trip trip = tripService.getTripById(id);
+        return ResponseEntity.ok(ApiResponse.success(trip));
+    }
+    
+    @GetMapping
+    @Trace(dispatcher = true)
+    @Operation(summary = "Get trip by ride ID", description = "Retrieves trip details by ride ID")
+    public ResponseEntity<ApiResponse<Trip>> getTripByRideId(@RequestParam Long rideId) {
+        Trip trip = tripService.getTripByRideId(rideId);
         return ResponseEntity.ok(ApiResponse.success(trip));
     }
 }

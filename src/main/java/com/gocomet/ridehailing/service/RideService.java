@@ -18,10 +18,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -210,6 +212,40 @@ public class RideService {
     }
     
     @Trace
+    public List<RideResponse> getAllRides(String status, int limit) {
+        try {
+            List<Ride> rides;
+            if (status != null && !status.isEmpty()) {
+                try {
+                    RideStatus rideStatus = RideStatus.valueOf(status.toUpperCase());
+                    // Filter by status - get all rides and filter by status
+                    rides = rideRepository.findAll().stream()
+                        .filter(r -> r.getStatus() == rideStatus)
+                        .collect(Collectors.toList());
+                } catch (IllegalArgumentException e) {
+                    log.warn("Invalid ride status: {}", status);
+                    rides = rideRepository.findAll();
+                }
+            } else {
+                rides = rideRepository.findAll();
+            }
+            
+            // Sort by created date descending and limit
+            rides = rides.stream()
+                .sorted((a, b) -> b.getCreatedAt().compareTo(a.getCreatedAt()))
+                .limit(limit)
+                .collect(Collectors.toList());
+            
+            return rides.stream()
+                .map(this::mapRideToResponse)
+                .collect(Collectors.toList());
+        } catch (Exception e) {
+            log.error("Error getting all rides", e);
+            throw new RideException("Failed to retrieve rides: " + e.getMessage());
+        }
+    }
+    
+    @Trace
     public RideResponse getRideById(Long rideId) {
         Ride ride = rideRepository.findById(rideId)
             .orElseThrow(() -> new RideException("Ride not found"));
@@ -237,6 +273,10 @@ public class RideService {
         
         log.info("Ride {} cancelled. Reason: {}", rideId, reason);
         
+        return mapToResponse(ride);
+    }
+    
+    public RideResponse mapRideToResponse(Ride ride) {
         return mapToResponse(ride);
     }
     

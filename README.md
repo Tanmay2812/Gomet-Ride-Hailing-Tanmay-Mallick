@@ -389,7 +389,7 @@ Built for GoComet DAW Assessment
 
 ## 📞 Support
 
-For questions or issues, please contact [your-email@example.com]
+For questions or issues, please contact [mallicktanmay2812@gmail.com]
 
 ---
 

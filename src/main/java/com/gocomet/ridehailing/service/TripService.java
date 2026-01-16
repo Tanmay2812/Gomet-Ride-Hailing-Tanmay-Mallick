@@ -106,7 +106,8 @@ public class TripService {
         // Calculate paused duration
         if (trip.getPausedAt() != null) {
             long pausedSeconds = ChronoUnit.SECONDS.between(trip.getPausedAt(), LocalDateTime.now());
-            trip.setPausedDurationSeconds(trip.getPausedDurationSeconds() + pausedSeconds);
+            long currentPaused = trip.getPausedDurationSeconds() != null ? trip.getPausedDurationSeconds() : 0L;
+            trip.setPausedDurationSeconds(currentPaused + pausedSeconds);
         }
         
         trip.setStatus(TripStatus.RESUMED);
@@ -139,7 +140,8 @@ public class TripService {
             
             // Calculate trip duration (excluding paused time)
             long totalSeconds = ChronoUnit.SECONDS.between(trip.getStartTime(), trip.getEndTime());
-            long activeSeconds = totalSeconds - trip.getPausedDurationSeconds();
+            long pausedSeconds = trip.getPausedDurationSeconds() != null ? trip.getPausedDurationSeconds() : 0L;
+            long activeSeconds = totalSeconds - pausedSeconds;
             trip.setDurationMinutes(activeSeconds / 60);
             
             // Calculate fare

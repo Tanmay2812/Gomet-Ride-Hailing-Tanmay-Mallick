@@ -36,11 +36,21 @@ function RideRequest() {
 
     try {
       const response = await createRide(formData);
-      setResult(response.data);
-      console.log('Ride created:', response);
+      // Response structure: {success: true, message: "...", data: {...}}
+      if (response.success && response.data) {
+        setResult(response.data);
+        console.log('Ride created:', response.data);
+      } else {
+        setError(response.message || 'Failed to create ride');
+      }
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to create ride');
+      const errorMessage = err.response?.data?.message || 
+                          err.response?.data?.error || 
+                          err.message || 
+                          'Failed to create ride';
+      setError(errorMessage);
       console.error('Error creating ride:', err);
+      console.error('Error details:', err.response?.data);
     } finally {
       setLoading(false);
     }

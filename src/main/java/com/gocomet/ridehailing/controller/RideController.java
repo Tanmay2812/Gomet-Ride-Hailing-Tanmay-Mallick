@@ -55,6 +55,19 @@ public class RideController {
         return ResponseEntity.ok(ApiResponse.success(response));
     }
     
+    @GetMapping
+    @Trace(dispatcher = true)
+    @Operation(summary = "Get all rides", description = "Retrieves all rides, optionally filtered by status")
+    public ResponseEntity<ApiResponse<java.util.List<RideResponse>>> getAllRides(
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false, defaultValue = "100") int limit) {
+        log.debug("Getting all rides, status: {}, limit: {}", status, limit);
+        
+        java.util.List<RideResponse> responses = rideService.getAllRides(status, limit);
+        
+        return ResponseEntity.ok(ApiResponse.success(responses));
+    }
+    
     @PostMapping("/{id}/cancel")
     @Trace(dispatcher = true)
     @Operation(summary = "Cancel a ride", description = "Cancels an active ride request")

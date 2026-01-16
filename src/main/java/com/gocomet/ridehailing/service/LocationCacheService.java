@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -20,7 +19,7 @@ public class LocationCacheService {
     private final RedisTemplate<String, Object> redisTemplate;
     private static final String DRIVER_LOCATION_PREFIX = "driver:location:";
     private static final String DRIVER_LOCATION_INDEX_PREFIX = "location:index:";
-    private static final long LOCATION_TTL_SECONDS = 30;
+    private static final long LOCATION_TTL_SECONDS = 300; // 5 minutes for demo/testing
     
     @Trace
     public void updateDriverLocation(Long driverId, Double latitude, Double longitude) {
@@ -86,21 +85,43 @@ public class LocationCacheService {
         try {
             String geoKey = DRIVER_LOCATION_INDEX_PREFIX + "all";
             
-            // Redis GEO commands use meters
-            org.springframework.data.geo.Distance distance = 
-                new org.springframework.data.geo.Distance(radiusKm, org.springframework.data.geo.Metrics.KILOMETERS);
-            org.springframework.data.geo.Point point = new org.springframework.data.geo.Point(longitude, latitude);
+            log.info("Searching for drivers near lat={}, lon={}, radius={}km", latitude, longitude, radiusKm);
             
-            var results = redisTemplate.opsForGeo()
-                .radius(geoKey, point, distance);
+            // Simplified approach: Get all driver locations and filter by distance
+            // This is more reliable than complex Redis GEO queries
+            List<Long> nearbyDrivers = new ArrayList<>();
             
-            if (results == null || results.getContent().isEmpty()) {
+            // Get all keys matching driver:location:*
+            Set<String> keys = redisTemplate.keys(DRIVER_LOCATION_PREFIX + "*");
+            
+            if (keys == null || keys.isEmpty()) {
+                log.warn("No driver locations found in cache");
                 return Collections.emptyList();
             }
             
-            return results.getContent().stream()
-                .map(result -> Long.parseLong(result.getContent().getName()))
-                .collect(Collectors.toList());
+            for (String key : keys) {
+                try {
+                    Long driverId = Long.parseLong(key.replace(DRIVER_LOCATION_PREFIX, ""));
+                    Optional<Location> driverLoc = getDriverLocation(driverId);
+                    
+                    if (driverLoc.isPresent()) {
+                        double distance = Location.calculateDistance(
+                            latitude, longitude,
+                            driverLoc.get().getLatitude(), driverLoc.get().getLongitude()
+                        );
+                        
+                        if (distance <= radiusKm) {
+                            nearbyDrivers.add(driverId);
+                            log.debug("Driver {} is {}km away", driverId, distance);
+                        }
+                    }
+                } catch (Exception e) {
+                    log.warn("Error processing driver location key: {}", key, e);
+                }
+            }
+            
+            log.info("Found {} nearby drivers: {}", nearbyDrivers.size(), nearbyDrivers);
+            return nearbyDrivers;
         } catch (Exception e) {
             log.error("Error finding nearby drivers", e);
             return Collections.emptyList();

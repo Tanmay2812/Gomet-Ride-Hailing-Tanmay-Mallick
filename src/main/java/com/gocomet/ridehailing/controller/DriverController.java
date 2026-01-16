@@ -4,6 +4,9 @@ import com.gocomet.ridehailing.model.dto.AcceptRideRequest;
 import com.gocomet.ridehailing.model.dto.ApiResponse;
 import com.gocomet.ridehailing.model.dto.DriverLocationUpdate;
 import com.gocomet.ridehailing.model.dto.RideResponse;
+import com.gocomet.ridehailing.model.entity.Ride;
+import com.gocomet.ridehailing.model.enums.RideStatus;
+import com.gocomet.ridehailing.repository.RideRepository;
 import com.gocomet.ridehailing.service.LocationCacheService;
 import com.gocomet.ridehailing.service.RideService;
 import com.newrelic.api.agent.Trace;
@@ -15,6 +18,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @RestController
 @RequestMapping("/v1/drivers")
 @RequiredArgsConstructor
@@ -24,6 +30,7 @@ public class DriverController {
     
     private final RideService rideService;
     private final LocationCacheService locationCacheService;
+    private final RideRepository rideRepository;
     
     @PostMapping("/{id}/location")
     @Trace(dispatcher = true)
@@ -65,5 +72,26 @@ public class DriverController {
         log.info("Ride accepted by driver {} in {}ms", id, duration);
         
         return ResponseEntity.ok(ApiResponse.success("Ride accepted successfully", response));
+    }
+    
+    @GetMapping("/{id}/pending-rides")
+    @Trace(dispatcher = true)
+    @Operation(summary = "Get pending rides for driver", description = "Gets all rides matched to this driver that are pending acceptance")
+    public ResponseEntity<ApiResponse<List<RideResponse>>> getPendingRides(@PathVariable Long id) {
+        log.debug("Getting pending rides for driver {}", id);
+        
+        // Find all rides matched to this driver that haven't been accepted yet
+        List<Ride> pendingRides = rideRepository.findByDriverIdOrderByCreatedAtDesc(id)
+            .stream()
+            .filter(ride -> ride.getStatus() == RideStatus.MATCHED)
+            .collect(Collectors.toList());
+        
+        List<RideResponse> responses = pendingRides.stream()
+            .map(rideService::mapRideToResponse)
+            .collect(Collectors.toList());
+        
+        log.info("Found {} pending rides for driver {}", responses.size(), id);
+        
+        return ResponseEntity.ok(ApiResponse.success(responses));
     }
 }

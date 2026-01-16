@@ -39,10 +39,9 @@ public class PaymentService {
     public PaymentResponse processPayment(PaymentRequest request) {
         try {
             // Check for idempotency
-            String idempotencyKey = request.getIdempotencyKey();
-            if (idempotencyKey == null || idempotencyKey.isEmpty()) {
-                idempotencyKey = generateIdempotencyKey(request);
-            }
+            final String idempotencyKey = (request.getIdempotencyKey() == null || request.getIdempotencyKey().isEmpty()) 
+                ? generateIdempotencyKey(request) 
+                : request.getIdempotencyKey();
             
             // Check if payment already exists
             return paymentRepository.findByIdempotencyKey(idempotencyKey)
