@@ -1,0 +1,44 @@
+spring:
+  datasource:
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/ride_hailing}
+    username: ${DATABASE_USER:postgres}
+    password: ${DATABASE_PASSWORD:postgres}
+    hikari:
+      maximum-pool-size: 100
+      minimum-idle: 20
+  
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+  
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+
+server:
+  port: ${PORT:8080}
+
+# Production logging
+logging:
+  level:
+    com.gocomet: INFO
+    org.springframework: WARN
+  file:
+    name: logs/application.log
+
+# New Relic
+newrelic:
+  config:
+    app_name: GoComet-Ride-Hailing-Prod
+    license_key: ${NEW_RELIC_LICENSE_KEY}
+    log_level: info
+    distributed_tracing:
+      enabled: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,metrics

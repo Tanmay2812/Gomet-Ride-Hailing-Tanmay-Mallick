@@ -1,0 +1,33 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+  
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+app:
+  matching:
+    search-radius-km: 5.0
+    max-drivers-to-consider: 20
+    matching-timeout-ms: 1000
+  
+  surge:
+    base-multiplier: 1.0
+    max-multiplier: 3.0
+    demand-threshold: 10
+  
+  fare:
+    base-fare: 50.0
+    per-km-rate: 12.0
+    per-minute-rate: 2.0
+    minimum-fare: 70.0

@@ -1,0 +1,114 @@
+spring:
+  application:
+    name: gocomet-ride-hailing
+  
+  datasource:
+    url: jdbc:postgresql://localhost:5432/ride_hailing
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 50
+      minimum-idle: 10
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+  
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+        jdbc:
+          batch_size: 50
+        order_inserts: true
+        order_updates: true
+        query:
+          in_clause_parameter_padding: true
+  
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      timeout: 2000ms
+      lettuce:
+        pool:
+          max-active: 50
+          max-idle: 20
+          min-idle: 10
+  
+  cache:
+    type: redis
+    redis:
+      time-to-live: 600000
+
+server:
+  port: 8080
+  compression:
+    enabled: true
+  http2:
+    enabled: true
+
+# Application specific configuration
+app:
+  matching:
+    search-radius-km: 5.0
+    max-drivers-to-consider: 20
+    matching-timeout-ms: 1000
+  
+  surge:
+    base-multiplier: 1.0
+    max-multiplier: 3.0
+    demand-threshold: 10
+  
+  fare:
+    base-fare: 50.0
+    per-km-rate: 12.0
+    per-minute-rate: 2.0
+    minimum-fare: 70.0
+  
+  payment:
+    timeout-ms: 5000
+    retry-attempts: 3
+  
+  location:
+    cache-ttl-seconds: 30
+    update-batch-size: 1000
+
+# New Relic Configuration
+newrelic:
+  config:
+    app_name: GoComet-Ride-Hailing
+    license_key: ${NEW_RELIC_LICENSE_KEY:your-license-key}
+    log_level: info
+    audit_mode: false
+    distributed_tracing:
+      enabled: true
+
+# Management endpoints for monitoring
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: always
+  metrics:
+    export:
+      newrelic:
+        enabled: true
+        api-key: ${NEW_RELIC_LICENSE_KEY:your-license-key}
+        account-id: ${NEW_RELIC_ACCOUNT_ID:your-account-id}
+
+# Logging
+logging:
+  level:
+    com.gocomet: INFO
+    org.springframework: WARN
+    org.hibernate: WARN
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
