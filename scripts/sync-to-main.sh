@@ -34,9 +34,21 @@ git pull origin main 2>/dev/null || echo "No remote changes"
 # Merge dev into main (but we'll exclude docs later)
 echo ""
 echo "🔀 Merging dev into main..."
-git merge dev --no-commit --no-ff || true
+git merge dev --no-commit --no-ff 2>&1 | tee /tmp/merge_output.txt || true
 
-# Remove docs folder if it exists
+# Handle conflicts - remove docs folder conflicts
+if grep -q "CONFLICT" /tmp/merge_output.txt; then
+    echo ""
+    echo "⚠️  Merge conflicts detected. Resolving docs folder conflicts..."
+    # Remove all docs folder conflicts
+    git rm -rf docs/ 2>/dev/null || true
+    rm -rf docs/ 2>/dev/null || true
+    # Resolve other conflicts by accepting dev version
+    git checkout --theirs . 2>/dev/null || true
+    git add -A
+fi
+
+# Remove docs folder if it exists (in case merge didn't conflict)
 if [ -d "docs" ]; then
     echo ""
     echo "🗑️  Removing docs folder from main branch..."
@@ -50,8 +62,14 @@ git add -A
 git reset HEAD docs/ 2>/dev/null || true
 git reset HEAD -- docs 2>/dev/null || true
 
+# Ensure docs folder is removed
+if [ -d "docs" ]; then
+    rm -rf docs/
+    git add -A
+fi
+
 # Check if there are changes to commit
-if git diff --cached --quiet; then
+if git diff --cached --quiet && [ -z "$(git status --porcelain)" ]; then
     echo ""
     echo "✅ No changes to sync. Main branch is already up to date."
     git merge --abort 2>/dev/null || true
