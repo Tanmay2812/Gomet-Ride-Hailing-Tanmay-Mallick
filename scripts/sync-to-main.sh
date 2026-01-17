@@ -2,7 +2,8 @@
 
 # Script to sync code from dev branch to main branch (excluding docs folder)
 
-set -e
+# Don't exit on error - we need to handle merge conflicts
+set +e
 
 echo "🔄 Syncing dev branch to main branch (excluding docs)..."
 echo ""
