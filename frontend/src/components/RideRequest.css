@@ -4,24 +4,27 @@
 }
 
 .ride-request h2 {
-  color: white;
+  color: var(--text-primary);
   margin-bottom: 2rem;
   font-size: 2rem;
   text-align: center;
+  font-weight: 700;
 }
 
 .presets {
-  background: rgba(255, 255, 255, 0.95);
-  border-radius: 15px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-default);
+  border-radius: 12px;
   padding: 1.5rem;
   margin-bottom: 2rem;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-sm);
 }
 
 .presets h3 {
-  color: #333;
+  color: var(--text-primary);
   margin-bottom: 1rem;
   font-size: 1.2rem;
+  font-weight: 600;
 }
 
 .preset-buttons {
@@ -31,11 +34,11 @@
 }
 
 .preset-btn {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+  background: var(--gradient-primary);
+  color: var(--text-primary);
   border: none;
   padding: 0.75rem 1.5rem;
-  border-radius: 25px;
+  border-radius: 8px;
   cursor: pointer;
   font-size: 0.95rem;
   font-weight: 600;
@@ -44,14 +47,15 @@
 
 .preset-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  box-shadow: var(--shadow-glow);
 }
 
 .ride-form {
-  background: rgba(255, 255, 255, 0.95);
-  border-radius: 15px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-default);
+  border-radius: 12px;
   padding: 2rem;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-sm);
 }
 
 .form-section {
@@ -59,11 +63,12 @@
 }
 
 .form-section h3 {
-  color: #667eea;
+  color: var(--accent-primary);
   margin-bottom: 1rem;
   font-size: 1.3rem;
-  border-bottom: 2px solid #667eea;
+  border-bottom: 2px solid var(--accent-primary);
   padding-bottom: 0.5rem;
+  font-weight: 600;
 }
 
 .form-row {
@@ -78,7 +83,7 @@
 
 .form-group label {
   display: block;
-  color: #555;
+  color: var(--text-secondary);
   font-weight: 600;
   margin-bottom: 0.5rem;
 }
@@ -87,25 +92,33 @@
 .form-group select {
   width: 100%;
   padding: 0.75rem;
-  border: 2px solid #e0e0e0;
+  background: var(--bg-input);
+  border: 1px solid var(--border-default);
   border-radius: 8px;
   font-size: 1rem;
-  transition: border-color 0.3s ease;
+  color: var(--text-primary);
+  transition: all 0.3s ease;
+}
+
+.form-group input::placeholder,
+.form-group select::placeholder {
+  color: var(--text-tertiary);
 }
 
 .form-group input:focus,
 .form-group select:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
 }
 
 .submit-btn {
   width: 100%;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+  background: var(--gradient-primary);
+  color: var(--text-primary);
   border: none;
   padding: 1rem 2rem;
-  border-radius: 50px;
+  border-radius: 8px;
   font-size: 1.2rem;
   font-weight: bold;
   cursor: pointer;
@@ -115,11 +128,11 @@
 
 .submit-btn:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+  box-shadow: var(--shadow-glow);
 }
 
 .submit-btn:disabled {
-  opacity: 0.7;
+  opacity: 0.6;
   cursor: not-allowed;
 }
 
@@ -128,18 +141,19 @@
   padding: 1.5rem;
   border-radius: 10px;
   animation: slideIn 0.3s ease;
+  border: 1px solid;
 }
 
 .alert-error {
-  background: #f8d7da;
-  border: 2px solid #f5c6cb;
-  color: #721c24;
+  background: rgba(239, 68, 68, 0.1);
+  border-color: var(--accent-error);
+  color: var(--accent-error);
 }
 
 .alert-success {
-  background: #d4edda;
-  border: 2px solid #c3e6cb;
-  color: #155724;
+  background: rgba(16, 185, 129, 0.1);
+  border-color: var(--accent-success);
+  color: var(--accent-success);
 }
 
 .alert h3 {
@@ -155,15 +169,17 @@
 .result-details p {
   margin: 0.75rem 0;
   font-size: 1.05rem;
+  color: var(--text-primary);
 }
 
 .result-details .tip {
   margin-top: 1rem;
   padding: 0.75rem;
-  background: rgba(102, 126, 234, 0.1);
+  background: rgba(99, 102, 241, 0.1);
   border-radius: 8px;
-  color: #667eea;
+  color: var(--accent-primary);
   font-weight: 600;
+  border: 1px solid var(--border-accent);
 }
 
 @media (max-width: 768px) {

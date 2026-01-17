@@ -10,6 +10,7 @@ import com.gocomet.ridehailing.model.enums.DriverStatus;
 import com.gocomet.ridehailing.model.enums.RideStatus;
 import com.gocomet.ridehailing.repository.DriverRepository;
 import com.gocomet.ridehailing.repository.RideRepository;
+import com.gocomet.ridehailing.repository.RiderRepository;
 import com.newrelic.api.agent.Trace;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,6 +33,7 @@ public class RideService {
     
     private final RideRepository rideRepository;
     private final DriverRepository driverRepository;
+    private final RiderRepository riderRepository;
     private final DriverMatchingService driverMatchingService;
     private final SurgePricingService surgePricingService;
     private final FareCalculationService fareCalculationService;
@@ -243,6 +245,44 @@ public class RideService {
             log.error("Error getting all rides", e);
             throw new RideException("Failed to retrieve rides: " + e.getMessage());
         }
+    }
+    
+    @Trace
+    public List<RideResponse> getRidesByRiderId(Long riderId) {
+        try {
+            List<Ride> rides = rideRepository.findByRiderIdOrderByCreatedAtDesc(riderId);
+            return rides.stream()
+                .map(this::mapRideToResponse)
+                .collect(Collectors.toList());
+        } catch (Exception e) {
+            log.error("Error getting rides for rider: {}", riderId, e);
+            throw new RideException("Failed to retrieve rides: " + e.getMessage());
+        }
+    }
+    
+    @Trace
+    public List<RideResponse> getRidesByDriverId(Long driverId) {
+        try {
+            List<Ride> rides = rideRepository.findByDriverIdOrderByCreatedAtDesc(driverId);
+            return rides.stream()
+                .map(this::mapRideToResponse)
+                .collect(Collectors.toList());
+        } catch (Exception e) {
+            log.error("Error getting rides for driver: {}", driverId, e);
+            throw new RideException("Failed to retrieve rides: " + e.getMessage());
+        }
+    }
+    
+    @Trace
+    public com.gocomet.ridehailing.model.entity.Driver getDriverById(Long driverId) {
+        return driverRepository.findById(driverId)
+            .orElseThrow(() -> new RideException("Driver not found"));
+    }
+    
+    @Trace
+    public com.gocomet.ridehailing.model.entity.Rider getRiderById(Long riderId) {
+        return riderRepository.findById(riderId)
+            .orElseThrow(() -> new RideException("Rider not found"));
     }
     
     @Trace

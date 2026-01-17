@@ -74,6 +74,17 @@ public class DriverController {
         return ResponseEntity.ok(ApiResponse.success("Ride accepted successfully", response));
     }
     
+    @GetMapping("/{id}")
+    @Trace(dispatcher = true)
+    @Operation(summary = "Get driver details", description = "Retrieves driver information and statistics")
+    public ResponseEntity<ApiResponse<com.gocomet.ridehailing.model.entity.Driver>> getDriverById(@PathVariable Long id) {
+        log.debug("Getting driver: {}", id);
+        
+        com.gocomet.ridehailing.model.entity.Driver driver = rideService.getDriverById(id);
+        
+        return ResponseEntity.ok(ApiResponse.success(driver));
+    }
+    
     @GetMapping("/{id}/pending-rides")
     @Trace(dispatcher = true)
     @Operation(summary = "Get pending rides for driver", description = "Gets all rides matched to this driver that are pending acceptance")

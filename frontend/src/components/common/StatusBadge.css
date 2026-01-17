@@ -1,0 +1,49 @@
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.4rem 1rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.status-requested,
+.status-searching {
+  background: rgba(113, 113, 122, 0.2);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-default);
+}
+
+.status-matched,
+.status-accepted {
+  background: rgba(16, 185, 129, 0.2);
+  color: var(--accent-success);
+  border: 1px solid var(--accent-success);
+}
+
+.status-in_progress {
+  background: rgba(59, 130, 246, 0.2);
+  color: var(--accent-info);
+  border: 1px solid var(--accent-info);
+}
+
+.status-completed {
+  background: rgba(16, 185, 129, 0.2);
+  color: var(--accent-success);
+  border: 1px solid var(--accent-success);
+}
+
+.status-cancelled,
+.status-failed {
+  background: rgba(239, 68, 68, 0.2);
+  color: var(--accent-error);
+  border: 1px solid var(--accent-error);
+}
+
+.status-default {
+  background: rgba(99, 102, 241, 0.2);
+  color: var(--accent-primary);
+  border: 1px solid var(--accent-primary);
+}

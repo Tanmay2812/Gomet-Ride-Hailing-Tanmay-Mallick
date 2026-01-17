@@ -4,7 +4,7 @@ import { acceptRide, updateDriverLocation, startTrip, endTrip, getPendingRides, 
 import wsService from '../services/websocket';
 
 function DriverPanel() {
-  const [driverId, setDriverId] = useState(1);
+  const [driverIdInput, setDriverIdInput] = useState('1');
   const [location, setLocation] = useState({
     latitude: 28.6139,
     longitude: 77.2090
@@ -13,6 +13,48 @@ function DriverPanel() {
   const [activeRide, setActiveRide] = useState(null);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState(null);
+
+  // Parse driverId from input
+  const driverId = parseInt(driverIdInput) || 0;
+
+  // Fetch active ride on mount (if driver has an accepted/in-progress ride)
+  useEffect(() => {
+    const fetchActiveRide = async () => {
+      if (!driverId || driverId <= 0) return;
+      
+      try {
+        console.log(`[DriverPanel] 🔍 Checking for active ride for driver ${driverId}...`);
+        // Get all rides for this driver
+        const response = await fetch(`http://localhost:8080/v1/rides?limit=100`);
+        const data = await response.json();
+        
+        if (data.success && Array.isArray(data.data)) {
+          // Find rides that are ACCEPTED or IN_PROGRESS for this driver
+          const activeRides = data.data.filter(r => 
+            r.driverId === driverId && 
+            (r.status === 'ACCEPTED' || r.status === 'IN_PROGRESS')
+          );
+          
+          if (activeRides.length > 0) {
+            // Get the most recent active ride
+            const latestActiveRide = activeRides.sort((a, b) => 
+              new Date(b.createdAt || b.matchedAt) - new Date(a.createdAt || a.matchedAt)
+            )[0];
+            
+            console.log(`[DriverPanel] ✅ Found active ride: #${latestActiveRide.id}, Status: ${latestActiveRide.status}`);
+            setActiveRide(latestActiveRide);
+          } else {
+            console.log(`[DriverPanel] ℹ️ No active ride found for driver ${driverId}`);
+            setActiveRide(null);
+          }
+        }
+      } catch (error) {
+        console.error('[DriverPanel] Error fetching active ride:', error);
+      }
+    };
+    
+    fetchActiveRide();
+  }, [driverId]);
 
   // Fetch pending rides on mount and when driverId changes
   useEffect(() => {
@@ -232,6 +274,10 @@ function DriverPanel() {
   };
 
   const handleUpdateLocation = async () => {
+    if (!driverId || driverId <= 0) {
+      showMessage('Please enter a valid Driver ID', 'error');
+      return;
+    }
     try {
       await updateDriverLocation(driverId, {
         driverId: driverId,
@@ -241,7 +287,8 @@ function DriverPanel() {
       });
       showMessage('Location updated', 'success');
     } catch (error) {
-      showMessage('Failed to update location', 'error');
+      console.error('[DriverPanel] Error updating location:', error);
+      showMessage('Failed to update location: ' + (error.response?.data?.message || error.message), 'error');
     }
   };
 
@@ -261,8 +308,10 @@ function DriverPanel() {
           <label>Driver ID</label>
           <input
             type="number"
-            value={driverId}
-            onChange={(e) => setDriverId(Number(e.target.value))}
+            value={driverIdInput}
+            onChange={(e) => setDriverIdInput(e.target.value)}
+            min="1"
+            placeholder="Enter Driver ID"
           />
         </div>
         <div className="location-group">

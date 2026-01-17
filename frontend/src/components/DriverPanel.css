@@ -4,10 +4,11 @@
 }
 
 .driver-panel h2 {
-  color: white;
+  color: var(--text-primary);
   margin-bottom: 2rem;
   font-size: 2rem;
   text-align: center;
+  font-weight: 700;
 }
 
 .message {
@@ -16,44 +17,47 @@
   margin-bottom: 1.5rem;
   font-weight: 600;
   animation: slideIn 0.3s ease;
+  border: 1px solid;
 }
 
 .message.success {
-  background: #d4edda;
-  color: #155724;
-  border: 2px solid #c3e6cb;
+  background: rgba(16, 185, 129, 0.1);
+  color: var(--accent-success);
+  border-color: var(--accent-success);
 }
 
 .message.error {
-  background: #f8d7da;
-  color: #721c24;
-  border: 2px solid #f5c6cb;
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--accent-error);
+  border-color: var(--accent-error);
 }
 
 .message.info {
-  background: #d1ecf1;
-  color: #0c5460;
-  border: 2px solid #bee5eb;
+  background: rgba(59, 130, 246, 0.1);
+  color: var(--accent-info);
+  border-color: var(--accent-info);
 }
 
 .driver-info-card,
 .active-ride-card,
 .pending-rides-card {
-  background: rgba(255, 255, 255, 0.95);
-  border-radius: 15px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-default);
+  border-radius: 12px;
   padding: 2rem;
   margin-bottom: 1.5rem;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-sm);
 }
 
 .driver-info-card h3,
 .active-ride-card h3,
 .pending-rides-card h3 {
-  color: #667eea;
+  color: var(--accent-primary);
   margin-bottom: 1.5rem;
   font-size: 1.4rem;
-  border-bottom: 2px solid #667eea;
+  border-bottom: 2px solid var(--accent-primary);
   padding-bottom: 0.5rem;
+  font-weight: 600;
 }
 
 .form-row {
@@ -68,7 +72,7 @@
 
 .form-group label {
   display: block;
-  color: #555;
+  color: var(--text-secondary);
   font-weight: 600;
   margin-bottom: 0.5rem;
 }
@@ -76,28 +80,37 @@
 .form-group input {
   width: 100%;
   padding: 0.75rem;
-  border: 2px solid #e0e0e0;
+  background: var(--bg-input);
+  border: 1px solid var(--border-default);
   border-radius: 8px;
   font-size: 1rem;
+  color: var(--text-primary);
+  transition: all 0.3s ease;
+}
+
+.form-group input::placeholder {
+  color: var(--text-tertiary);
 }
 
 .form-group input:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
 }
 
 .location-group h4 {
-  color: #333;
+  color: var(--text-primary);
   margin: 1rem 0 1rem 0;
+  font-weight: 600;
 }
 
 .update-btn {
   width: 100%;
-  background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);
-  color: #333;
+  background: var(--gradient-success);
+  color: white;
   border: none;
   padding: 0.75rem;
-  border-radius: 25px;
+  border-radius: 8px;
   font-size: 1rem;
   font-weight: bold;
   cursor: pointer;
@@ -107,23 +120,24 @@
 
 .update-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  box-shadow: var(--shadow-md);
 }
 
 .active-ride-card {
-  border-left: 4px solid #28a745;
+  border-left: 4px solid var(--accent-success);
 }
 
 .ride-info {
-  background: #f8f9fa;
+  background: var(--bg-tertiary);
   padding: 1.5rem;
   border-radius: 10px;
   margin-bottom: 1rem;
+  border: 1px solid var(--border-default);
 }
 
 .ride-info p {
   margin: 0.75rem 0;
-  color: #333;
+  color: var(--text-primary);
   font-size: 1.05rem;
 }
 
@@ -136,7 +150,7 @@
   flex: 1;
   padding: 1rem;
   border: none;
-  border-radius: 25px;
+  border-radius: 8px;
   font-size: 1.1rem;
   font-weight: bold;
   cursor: pointer;
@@ -145,16 +159,16 @@
 }
 
 .action-btn.start {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--gradient-primary);
 }
 
 .action-btn.end {
-  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  background: var(--gradient-danger);
 }
 
 .action-btn:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  box-shadow: var(--shadow-md);
 }
 
 .action-btn:disabled {
@@ -165,11 +179,11 @@
 .empty-state {
   text-align: center;
   padding: 2rem;
-  color: #666;
+  color: var(--text-secondary);
 }
 
 .empty-state .hint {
-  color: #999;
+  color: var(--text-tertiary);
   font-size: 0.9rem;
   margin-top: 0.5rem;
 }
@@ -180,8 +194,8 @@
 }
 
 .ride-request-card {
-  background: white;
-  border: 2px solid #e0e0e0;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-default);
   border-radius: 10px;
   padding: 1.5rem;
   transition: all 0.3s ease;
@@ -189,8 +203,9 @@
 }
 
 .ride-request-card:hover {
-  border-color: #667eea;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-color: var(--border-accent);
+  box-shadow: var(--shadow-sm);
+  transform: translateY(-2px);
 }
 
 .ride-header {
@@ -202,12 +217,12 @@
 
 .ride-id {
   font-weight: bold;
-  color: #333;
+  color: var(--text-primary);
   font-size: 1.1rem;
 }
 
 .new-badge {
-  background: #ff6b6b;
+  background: var(--accent-error);
   color: white;
   padding: 0.3rem 0.8rem;
   border-radius: 15px;
@@ -223,7 +238,7 @@
 
 .ride-details {
   margin-bottom: 1rem;
-  color: #555;
+  color: var(--text-secondary);
 }
 
 .ride-details p {
@@ -232,11 +247,11 @@
 
 .accept-btn {
   width: 100%;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--gradient-primary);
   color: white;
   border: none;
   padding: 0.875rem;
-  border-radius: 25px;
+  border-radius: 8px;
   font-size: 1rem;
   font-weight: bold;
   cursor: pointer;
@@ -245,7 +260,7 @@
 
 .accept-btn:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  box-shadow: var(--shadow-glow);
 }
 
 .accept-btn:disabled {
