@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -27,6 +28,7 @@ public class PaymentService {
     private final PaymentRepository paymentRepository;
     private final RideRepository rideRepository;
     private final TripRepository tripRepository;
+    private final NotificationService notificationService;
     
     @Value("${app.payment.timeout-ms:5000}")
     private Long paymentTimeoutMs;
@@ -59,7 +61,8 @@ public class PaymentService {
         Ride ride = rideRepository.findById(request.getRideId())
             .orElseThrow(() -> new PaymentException("Ride not found"));
         
-        Trip trip = tripRepository.findById(request.getTripId())
+        // Validate trip exists
+        tripRepository.findById(request.getTripId())
             .orElseThrow(() -> new PaymentException("Trip not found"));
         
         // Create payment record
@@ -84,10 +87,35 @@ public class PaymentService {
             payment.setStatus(PaymentStatus.SUCCESS);
             payment.setTransactionId(UUID.randomUUID().toString());
             log.info("Payment successful for ride {}: ₹{}", request.getRideId(), request.getAmount());
+            
+            // Send payment success notification
+            notificationService.notifyRider(ride.getRiderId(), "PAYMENT_SUCCESS", Map.of(
+                "rideId", ride.getId(),
+                "paymentId", payment.getId(),
+                "amount", payment.getAmount(),
+                "transactionId", payment.getTransactionId(),
+                "message", "Payment successful! Amount: ₹" + payment.getAmount()
+            ));
+            
+            notificationService.notifyDriver(ride.getDriverId(), "PAYMENT_RECEIVED", Map.of(
+                "rideId", ride.getId(),
+                "paymentId", payment.getId(),
+                "amount", payment.getAmount(),
+                "message", "Payment received for ride #" + ride.getId()
+            ));
         } else {
             payment.setStatus(PaymentStatus.FAILED);
             payment.setFailureReason("Payment gateway declined");
             log.error("Payment failed for ride {}", request.getRideId());
+            
+            // Send payment failure notification
+            notificationService.notifyRider(ride.getRiderId(), "PAYMENT_FAILED", Map.of(
+                "rideId", ride.getId(),
+                "paymentId", payment.getId(),
+                "amount", payment.getAmount(),
+                "reason", payment.getFailureReason(),
+                "message", "Payment failed. Please try again."
+            ));
         }
         
         payment = paymentRepository.save(payment);
@@ -138,11 +166,39 @@ public class PaymentService {
         
         boolean success = processWithPaymentGateway(payment);
         
+        Ride ride = rideRepository.findById(payment.getRideId())
+            .orElseThrow(() -> new PaymentException("Ride not found"));
+        
         if (success) {
             payment.setStatus(PaymentStatus.SUCCESS);
             payment.setTransactionId(UUID.randomUUID().toString());
+            
+            // Send payment success notification
+            notificationService.notifyRider(ride.getRiderId(), "PAYMENT_SUCCESS", Map.of(
+                "rideId", ride.getId(),
+                "paymentId", payment.getId(),
+                "amount", payment.getAmount(),
+                "transactionId", payment.getTransactionId(),
+                "message", "Payment successful! Amount: ₹" + payment.getAmount()
+            ));
+            
+            notificationService.notifyDriver(ride.getDriverId(), "PAYMENT_RECEIVED", Map.of(
+                "rideId", ride.getId(),
+                "paymentId", payment.getId(),
+                "amount", payment.getAmount(),
+                "message", "Payment received for ride #" + ride.getId()
+            ));
         } else {
             payment.setStatus(PaymentStatus.FAILED);
+            
+            // Send payment failure notification
+            notificationService.notifyRider(ride.getRiderId(), "PAYMENT_FAILED", Map.of(
+                "rideId", ride.getId(),
+                "paymentId", payment.getId(),
+                "amount", payment.getAmount(),
+                "reason", payment.getFailureReason(),
+                "message", "Payment failed. Please try again."
+            ));
         }
         
         payment = paymentRepository.save(payment);

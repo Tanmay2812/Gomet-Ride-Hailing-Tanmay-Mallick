@@ -4,9 +4,37 @@
 }
 
 .dashboard h2 {
-  color: white;
+  color: var(--text-primary);
   margin-bottom: 2rem;
   font-size: 2rem;
+  font-weight: 700;
+}
+
+.dashboard-controls {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  justify-content: flex-end;
+}
+
+.refresh-btn,
+.test-api-btn {
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  border: 1px solid var(--border-default);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.refresh-btn:hover:not(:disabled),
+.test-api-btn:hover:not(:disabled) {
+  background: var(--bg-card-hover);
+  border-color: var(--border-accent);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
 }
 
 .stats-container {
@@ -17,27 +45,31 @@
 }
 
 .stat-card {
-  background: white;
-  border-radius: 15px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-default);
+  border-radius: 12px;
   padding: 1.5rem;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-sm);
   text-align: center;
-  transition: transform 0.3s ease;
+  transition: all 0.3s ease;
 }
 
 .stat-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--shadow-md);
+  border-color: var(--border-accent);
 }
 
 .stat-card.active {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+  background: var(--gradient-primary);
+  border-color: var(--accent-primary);
+  color: var(--text-primary);
 }
 
 .stat-card.completed {
-  background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);
-  color: #333;
+  background: var(--gradient-success);
+  border-color: var(--accent-success);
+  color: white;
 }
 
 .stat-icon {
@@ -49,30 +81,34 @@
   font-size: 2.5rem;
   font-weight: bold;
   margin-bottom: 0.5rem;
+  color: var(--text-primary);
 }
 
 .stat-label {
   font-size: 0.9rem;
   opacity: 0.9;
+  color: var(--text-secondary);
 }
 
 .rides-container {
-  background: rgba(255, 255, 255, 0.95);
-  border-radius: 15px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-default);
+  border-radius: 12px;
   padding: 2rem;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-sm);
 }
 
 .rides-container h3 {
-  color: #333;
+  color: var(--text-primary);
   margin-bottom: 1.5rem;
   font-size: 1.5rem;
+  font-weight: 600;
 }
 
 .empty-state {
   text-align: center;
   padding: 3rem;
-  color: #666;
+  color: var(--text-secondary);
 }
 
 .rides-list {
@@ -81,11 +117,12 @@
 }
 
 .ride-card {
-  background: white;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-default);
   border-radius: 10px;
   padding: 1.5rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  border-left: 4px solid #667eea;
+  box-shadow: var(--shadow-sm);
+  border-left: 4px solid var(--accent-primary);
   transition: all 0.3s ease;
   animation: slideIn 0.3s ease;
 }
@@ -102,7 +139,9 @@
 }
 
 .ride-card:hover {
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--shadow-md);
+  border-color: var(--border-accent);
+  transform: translateY(-2px);
 }
 
 .ride-header {
@@ -111,19 +150,19 @@
   align-items: center;
   margin-bottom: 1rem;
   padding-bottom: 1rem;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid var(--border-default);
 }
 
 .ride-id {
   font-weight: bold;
-  color: #333;
+  color: var(--text-primary);
   font-size: 1.1rem;
 }
 
 .ride-status {
   padding: 0.4rem 1rem;
   border-radius: 20px;
-  color: white;
+  color: var(--text-primary);
   font-size: 0.85rem;
   font-weight: 600;
   display: inline-flex;
@@ -143,44 +182,44 @@
 }
 
 .detail-row .label {
-  color: #666;
+  color: var(--text-secondary);
   font-weight: 500;
 }
 
 .detail-row .value {
-  color: #333;
+  color: var(--text-primary);
   font-weight: 600;
   text-align: right;
 }
 
 .detail-row .value.fare {
-  color: #28a745;
+  color: var(--accent-success);
   font-size: 1.1rem;
 }
 
 .detail-row .value.surge {
-  color: #dc3545;
+  color: var(--accent-warning);
   font-weight: bold;
 }
 
 .driver-info {
   margin-top: 1rem;
   padding-top: 1rem;
-  border-top: 1px solid #eee;
-  background: #f8f9fa;
+  border-top: 1px solid var(--border-default);
+  background: var(--bg-tertiary);
   padding: 1rem;
   border-radius: 8px;
 }
 
 .driver-info h4 {
-  color: #667eea;
+  color: var(--accent-primary);
   margin-bottom: 0.75rem;
   font-size: 1rem;
 }
 
 .driver-info p {
   margin: 0.5rem 0;
-  color: #555;
+  color: var(--text-secondary);
 }
 
 @media (max-width: 768px) {

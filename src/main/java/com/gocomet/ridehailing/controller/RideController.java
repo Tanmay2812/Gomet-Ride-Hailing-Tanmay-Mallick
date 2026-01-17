@@ -60,10 +60,19 @@ public class RideController {
     @Operation(summary = "Get all rides", description = "Retrieves all rides, optionally filtered by status")
     public ResponseEntity<ApiResponse<java.util.List<RideResponse>>> getAllRides(
             @RequestParam(required = false) String status,
+            @RequestParam(required = false) Long riderId,
+            @RequestParam(required = false) Long driverId,
             @RequestParam(required = false, defaultValue = "100") int limit) {
-        log.debug("Getting all rides, status: {}, limit: {}", status, limit);
+        log.debug("Getting rides, status: {}, riderId: {}, driverId: {}, limit: {}", status, riderId, driverId, limit);
         
-        java.util.List<RideResponse> responses = rideService.getAllRides(status, limit);
+        java.util.List<RideResponse> responses;
+        if (riderId != null) {
+            responses = rideService.getRidesByRiderId(riderId);
+        } else if (driverId != null) {
+            responses = rideService.getRidesByDriverId(driverId);
+        } else {
+            responses = rideService.getAllRides(status, limit);
+        }
         
         return ResponseEntity.ok(ApiResponse.success(responses));
     }

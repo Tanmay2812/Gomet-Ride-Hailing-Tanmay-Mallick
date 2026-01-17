@@ -43,12 +43,18 @@ export const getAllRides = (status, limit = 100) => {
 export const cancelRide = (rideId, reason) => api.post(`/v1/rides/${rideId}/cancel?reason=${reason}`);
 
 // Driver API
+export const getDriverById = (driverId) => api.get(`/v1/drivers/${driverId}`);
 export const updateDriverLocation = (driverId, location) => 
   api.post(`/v1/drivers/${driverId}/location`, location);
 export const acceptRide = (driverId, acceptData) => 
   api.post(`/v1/drivers/${driverId}/accept`, acceptData);
 export const getPendingRides = (driverId) =>
   api.get(`/v1/drivers/${driverId}/pending-rides`);
+export const getRidesByDriverId = (driverId) => api.get(`/v1/rides?driverId=${driverId}`);
+
+// Rider API
+export const getRiderById = (riderId) => api.get(`/v1/riders/${riderId}`);
+export const getRidesByRiderId = (riderId) => api.get(`/v1/rides?riderId=${riderId}`);
 
 // Trip API
 export const startTrip = (rideId) => api.post(`/v1/trips/start?rideId=${rideId}`);

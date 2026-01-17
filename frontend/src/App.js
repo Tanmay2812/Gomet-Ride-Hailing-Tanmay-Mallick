@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './App.css';
 import Dashboard from './components/Dashboard';
 import RideRequest from './components/RideRequest';
 import DriverPanel from './components/DriverPanel';
+import RiderDetails from './components/RiderDetails';
+import DriverDetails from './components/DriverDetails';
 
 // GLOBAL TEST - runs immediately after imports
 console.log('[App] 🚨🚨🚨 App.js MODULE LOADED!');
@@ -11,7 +13,17 @@ console.log('[App] ✅ All imports loaded - Dashboard:', typeof Dashboard);
 function App() {
   console.log('[App] 🎯 App function EXECUTING!');
   
-  const [activeTab, setActiveTab] = useState('dashboard');
+  // Initialize activeTab from localStorage or default to 'dashboard'
+  const [activeTab, setActiveTab] = useState(() => {
+    const savedTab = localStorage.getItem('activeTab');
+    return savedTab || 'dashboard';
+  });
+  
+  // Persist activeTab to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem('activeTab', activeTab);
+    console.log('[App] 💾 Saved activeTab to localStorage:', activeTab);
+  }, [activeTab]);
   
   console.log('[App] Active tab:', activeTab);
   console.log('[App] Should render Dashboard?', activeTab === 'dashboard');
@@ -49,6 +61,24 @@ function App() {
           >
             Driver Panel
           </button>
+          <button 
+            className={activeTab === 'rider-details' ? 'active' : ''} 
+            onClick={() => {
+              console.log('[App] Rider Details button clicked!');
+              setActiveTab('rider-details');
+            }}
+          >
+            Rider Details
+          </button>
+          <button 
+            className={activeTab === 'driver-details' ? 'active' : ''} 
+            onClick={() => {
+              console.log('[App] Driver Details button clicked!');
+              setActiveTab('driver-details');
+            }}
+          >
+            Driver Details
+          </button>
         </nav>
       </header>
 
@@ -63,6 +93,10 @@ function App() {
             return <RideRequest key="rider" />;
           } else if (activeTab === 'driver') {
             return <DriverPanel key="driver" />;
+          } else if (activeTab === 'rider-details') {
+            return <RiderDetails key="rider-details" />;
+          } else if (activeTab === 'driver-details') {
+            return <DriverDetails key="driver-details" />;
           }
           return null;
         })()}

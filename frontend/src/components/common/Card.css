@@ -1,0 +1,13 @@
+.card {
+  background: var(--bg-card);
+  border-radius: 12px;
+  border: 1px solid var(--border-default);
+  transition: all 0.3s ease;
+}
+
+.card-hover:hover {
+  background: var(--bg-card-hover);
+  border-color: var(--border-accent);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
