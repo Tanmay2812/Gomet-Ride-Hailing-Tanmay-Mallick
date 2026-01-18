@@ -6,6 +6,7 @@ import com.gocomet.ridehailing.model.dto.Location;
 import com.gocomet.ridehailing.model.dto.RideResponse;
 import com.gocomet.ridehailing.model.entity.Driver;
 import com.gocomet.ridehailing.model.entity.Ride;
+import com.gocomet.ridehailing.model.entity.Rider;
 import com.gocomet.ridehailing.model.enums.DriverStatus;
 import com.gocomet.ridehailing.model.enums.RideStatus;
 import com.gocomet.ridehailing.repository.DriverRepository;
@@ -25,6 +26,7 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+import com.gocomet.ridehailing.model.enums.VehicleTier;
 
 @Service
 @RequiredArgsConstructor
@@ -39,6 +41,9 @@ public class RideService {
     private final FareCalculationService fareCalculationService;
     private final NotificationService notificationService;
     private final LocationCacheService locationCacheService;
+    
+    @org.springframework.beans.factory.annotation.Value("${app.matching.search-radius-km:5.0}")
+    private Double searchRadiusKm;
     
     @Trace
     @Transactional
@@ -129,10 +134,21 @@ public class RideService {
             
             if (bestDriverOpt.isEmpty()) {
                 log.warn("No driver found for ride {}", rideId);
+                
+                // Determine specific failure reason
+                String failureReason = determineFailureReason(
+                    request.getPickupLatitude(),
+                    request.getPickupLongitude(),
+                    request.getVehicleTier(),
+                    request.getRegion()
+                );
+                
                 ride.setStatus(RideStatus.FAILED);
+                ride.setFailureReason(failureReason);
                 rideRepository.save(ride);
                 notificationService.notifyRider(ride.getRiderId(), "RIDE_FAILED", 
-                    "No drivers available. Please try again.");
+                    failureReason);
+                notificationService.broadcastRideUpdate(mapToResponse(ride));
                 return CompletableFuture.completedFuture(null);
             }
             
@@ -145,8 +161,69 @@ public class RideService {
             return CompletableFuture.completedFuture(null);
         } catch (Exception e) {
             log.error("Error in async driver matching", e);
+            try {
+                Ride ride = rideRepository.findById(rideId).orElse(null);
+                if (ride != null) {
+                    ride.setStatus(RideStatus.FAILED);
+                    ride.setFailureReason("Driver matching error: " + e.getMessage());
+                    rideRepository.save(ride);
+                    notificationService.broadcastRideUpdate(mapToResponse(ride));
+                }
+            } catch (Exception ex) {
+                log.error("Error updating ride status after matching failure", ex);
+            }
             return CompletableFuture.failedFuture(e);
         }
+    }
+    
+    private String determineFailureReason(Double pickupLat, Double pickupLon, 
+                                         VehicleTier vehicleTier, String region) {
+        // Check if any drivers exist in database for this tier and region
+        List<Driver> availableDrivers = driverRepository
+            .findAvailableDriversByTierAndRegion(DriverStatus.AVAILABLE, vehicleTier, region);
+        
+        if (availableDrivers.isEmpty()) {
+            // Check if any drivers exist at all for this tier/region
+            List<Driver> allDrivers = driverRepository.findAll().stream()
+                .filter(d -> d.getVehicleTier() == vehicleTier && d.getRegion().equals(region))
+                .collect(java.util.stream.Collectors.toList());
+            
+            if (allDrivers.isEmpty()) {
+                return String.format("No %s drivers found in %s region. Please try a different vehicle tier or region.", 
+                    vehicleTier, region);
+            } else {
+                // Drivers exist but none are available
+                long availableCount = allDrivers.stream()
+                    .filter(d -> d.getStatus() == DriverStatus.AVAILABLE)
+                    .count();
+                if (availableCount == 0) {
+                    return String.format("No available %s drivers in %s. All drivers are currently busy or offline.", 
+                        vehicleTier, region);
+                }
+            }
+        }
+        
+        // Check if drivers have locations in Redis
+        List<Long> nearbyDriverIds = locationCacheService
+            .findNearbyDrivers(pickupLat, pickupLon, searchRadiusKm);
+        
+        if (nearbyDriverIds.isEmpty()) {
+            return String.format("No drivers found within %.1f km of pickup location. Drivers may need to update their location.", 
+                searchRadiusKm);
+        }
+        
+        // Check if available drivers are nearby
+        List<Long> candidateIds = availableDrivers.stream()
+            .map(Driver::getId)
+            .filter(nearbyDriverIds::contains)
+            .collect(java.util.stream.Collectors.toList());
+        
+        if (candidateIds.isEmpty()) {
+            return String.format("Available %s drivers in %s are not within %.1f km of pickup location.", 
+                vehicleTier, region, searchRadiusKm);
+        }
+        
+        return "No suitable driver found. Please try again later.";
     }
     
     @Trace
@@ -274,13 +351,13 @@ public class RideService {
     }
     
     @Trace
-    public com.gocomet.ridehailing.model.entity.Driver getDriverById(Long driverId) {
+    public Driver getDriverById(Long driverId) {
         return driverRepository.findById(driverId)
             .orElseThrow(() -> new RideException("Driver not found"));
     }
     
     @Trace
-    public com.gocomet.ridehailing.model.entity.Rider getRiderById(Long riderId) {
+    public Rider getRiderById(Long riderId) {
         return riderRepository.findById(riderId)
             .orElseThrow(() -> new RideException("Rider not found"));
     }
@@ -341,7 +418,8 @@ public class RideService {
             .matchedAt(ride.getMatchedAt())
             .acceptedAt(ride.getAcceptedAt())
             .startedAt(ride.getStartedAt())
-            .endedAt(ride.getEndedAt());
+            .endedAt(ride.getEndedAt())
+            .failureReason(ride.getFailureReason());
         
         // Add driver info if available
         if (ride.getDriverId() != null) {

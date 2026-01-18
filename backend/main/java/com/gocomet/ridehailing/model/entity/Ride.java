@@ -86,6 +86,9 @@ public class Ride {
     private LocalDateTime endedAt;
     
     private LocalDateTime cancelledAt;
+    
+    @Column(length = 500)
+    private String failureReason;
 
     @Version
     private Long version; // For optimistic locking

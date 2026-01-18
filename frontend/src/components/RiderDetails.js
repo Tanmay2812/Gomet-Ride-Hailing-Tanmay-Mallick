@@ -93,7 +93,12 @@ function RiderDetails() {
     setError(null);
     setSuccess(null);
     try {
-      const response = await createRider(formData);
+      // Ensure rating has a default value if not provided
+      const riderData = {
+        ...formData,
+        rating: formData.rating || 5.0
+      };
+      const response = await createRider(riderData);
       if (response && response.success) {
         setSuccess('Rider created successfully! ID: ' + response.data.id);
         setRider(response.data);
@@ -278,13 +283,19 @@ function RiderDetails() {
               placeholder="Delhi-NCR"
             />
             <Input
-              label="Rating"
+              label="Rating (default: 5.0)"
               type="number"
               step="0.1"
               min="0"
               max="5"
-              value={formData.rating}
-              onChange={(e) => setFormData({ ...formData, rating: parseFloat(e.target.value) || 5.0 })}
+              value={formData.rating || ''}
+              onChange={(e) => {
+                const value = e.target.value;
+                setFormData({ 
+                  ...formData, 
+                  rating: value === '' ? undefined : parseFloat(value) || 5.0 
+                });
+              }}
               placeholder="5.0"
             />
           </div>

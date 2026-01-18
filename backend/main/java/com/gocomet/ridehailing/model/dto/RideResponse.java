@@ -33,6 +33,7 @@ public class RideResponse {
     private LocalDateTime acceptedAt;
     private LocalDateTime startedAt;
     private LocalDateTime endedAt;
+    private String failureReason;
     private DriverInfo driverInfo;
     
     @Getter

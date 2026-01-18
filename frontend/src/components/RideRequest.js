@@ -254,16 +254,39 @@ function RideRequest() {
       )}
 
       {result && (
-        <div className="alert alert-success">
-          <h3>✅ Ride Created Successfully!</h3>
+        <div className={`alert ${result.status === 'FAILED' ? 'alert-error' : 'alert-success'}`}>
+          <h3>
+            {result.status === 'FAILED' ? '❌ Ride Creation Failed' : '✅ Ride Created Successfully!'}
+          </h3>
           <div className="result-details">
             <p><strong>Ride ID:</strong> {result.id}</p>
-            <p><strong>Status:</strong> {result.status}</p>
-            <p><strong>Estimated Fare:</strong> ₹{result.estimatedFare?.toFixed(2)}</p>
-            {result.surgeMultiplier > 1 && (
-              <p><strong>Surge Multiplier:</strong> {result.surgeMultiplier}x</p>
+            <p><strong>Status:</strong> 
+              <span className={`status-badge status-${result.status?.toLowerCase()}`}>
+                {result.status}
+              </span>
+            </p>
+            {result.status === 'FAILED' && result.failureReason && (
+              <div className="failure-reason">
+                <p><strong>⚠️ Reason:</strong></p>
+                <p className="reason-text">{result.failureReason}</p>
+                <p className="tip">💡 Suggestions:</p>
+                <ul className="suggestions">
+                  <li>Try a different vehicle tier (Economy, Premium, Luxury)</li>
+                  <li>Check if drivers are online and have updated their location</li>
+                  <li>Try a different pickup location</li>
+                  <li>Use the Driver Panel to ensure drivers are AVAILABLE</li>
+                </ul>
+              </div>
             )}
-            <p className="tip">💡 Check the Dashboard tab for real-time updates!</p>
+            {result.status !== 'FAILED' && (
+              <>
+                <p><strong>Estimated Fare:</strong> ₹{result.estimatedFare?.toFixed(2)}</p>
+                {result.surgeMultiplier > 1 && (
+                  <p><strong>Surge Multiplier:</strong> {result.surgeMultiplier}x</p>
+                )}
+                <p className="tip">💡 Check the Dashboard tab for real-time updates!</p>
+              </>
+            )}
           </div>
         </div>
       )}
