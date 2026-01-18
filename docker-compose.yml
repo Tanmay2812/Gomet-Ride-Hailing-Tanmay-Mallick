@@ -38,14 +38,16 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: gocomet-backend
+    env_file:
+      - .env
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/ride_hailing
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: postgres
       SPRING_DATA_REDIS_HOST: redis
       SPRING_DATA_REDIS_PORT: 6379
-      NEW_RELIC_LICENSE_KEY: ${NEW_RELIC_LICENSE_KEY:-your-license-key}
-      NEW_RELIC_ACCOUNT_ID: ${NEW_RELIC_ACCOUNT_ID:-your-account-id}
+      NEW_RELIC_LICENSE_KEY: ${NEW_RELIC_LICENSE_KEY:-}
+      NEW_RELIC_ACCOUNT_ID: ${NEW_RELIC_ACCOUNT_ID:-}
     ports:
       - "8080:8080"
     depends_on:

@@ -40,6 +40,22 @@ public class GlobalExceptionHandler {
             .body(ApiResponse.error(ex.getMessage()));
     }
 
+    @ExceptionHandler(RiderException.class)
+    public ResponseEntity<ApiResponse<Void>> handleRiderException(RiderException ex) {
+        log.error("Rider exception: {}", ex.getMessage());
+        return ResponseEntity
+            .status(HttpStatus.BAD_REQUEST)
+            .body(ApiResponse.error(ex.getMessage()));
+    }
+
+    @ExceptionHandler(DriverException.class)
+    public ResponseEntity<ApiResponse<Void>> handleDriverException(DriverException ex) {
+        log.error("Driver exception: {}", ex.getMessage());
+        return ResponseEntity
+            .status(HttpStatus.BAD_REQUEST)
+            .body(ApiResponse.error(ex.getMessage()));
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiResponse<Map<String, String>>> handleValidationExceptions(
             MethodArgumentNotValidException ex) {
