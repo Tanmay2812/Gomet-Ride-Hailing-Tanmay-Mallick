@@ -33,6 +33,17 @@ function App() {
     <div className="App">
       <header className="App-header">
         <h1>🚗 GoComet Ride Hailing</h1>
+        <p className="author-name">
+          Developed by{' '}
+          <a 
+            href="https://www.linkedin.com/in/mallicktanmay/" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="author-link"
+          >
+            Tanmay Mallick
+          </a>
+        </p>
         <nav className="nav-tabs">
           <button 
             className={activeTab === 'dashboard' ? 'active' : ''} 
@@ -104,6 +115,17 @@ function App() {
 
       <footer className="App-footer">
         <p>© 2026 GoComet - Multi-Region Ride Hailing Platform</p>
+        <p className="developer-credit">
+          Developed by{' '}
+          <a 
+            href="https://www.linkedin.com/in/mallicktanmay/" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="developer-link"
+          >
+            <strong>Tanmay Mallick</strong>
+          </a>
+        </p>
       </footer>
     </div>
   );

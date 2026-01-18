@@ -17,17 +17,23 @@
   margin-bottom: 2rem;
   justify-content: center;
   flex-wrap: wrap;
+  background: var(--bg-secondary);
+  padding: 1rem;
+  border-radius: 12px;
+  border: 1px solid var(--border-default);
 }
 
 .mode-tabs button {
   padding: 0.75rem 1.5rem;
   border-radius: 8px;
-  border: 1px solid var(--border-default);
+  border: 2px solid var(--border-default);
   background: var(--bg-card);
-  color: var(--text-secondary);
+  color: var(--text-primary);
   cursor: pointer;
   font-weight: 600;
+  font-size: 0.95rem;
   transition: all 0.3s ease;
+  min-width: 120px;
 }
 
 .mode-tabs button:hover {
