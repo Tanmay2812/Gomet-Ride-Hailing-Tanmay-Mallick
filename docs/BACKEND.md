@@ -39,7 +39,7 @@ The GoComet Ride Hailing backend is a production-ready Spring Boot application b
 ### Project Structure
 
 ```
-src/main/java/com/gocomet/ridehailing/
+backend/main/java/com/gocomet/ridehailing/
 ├── config/              # Configuration classes
 │   ├── AsyncConfig.java
 │   ├── NewRelicConfig.java
