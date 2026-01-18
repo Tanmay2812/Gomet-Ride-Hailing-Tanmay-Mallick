@@ -15,6 +15,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,6 +30,7 @@ import java.util.stream.Collectors;
 public class DriverController {
     
     private final RideService rideService;
+    private final com.gocomet.ridehailing.service.DriverService driverService;
     private final LocationCacheService locationCacheService;
     private final RideRepository rideRepository;
     
@@ -77,12 +79,34 @@ public class DriverController {
     @GetMapping("/{id}")
     @Trace(dispatcher = true)
     @Operation(summary = "Get driver details", description = "Retrieves driver information and statistics")
-    public ResponseEntity<ApiResponse<com.gocomet.ridehailing.model.entity.Driver>> getDriverById(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<com.gocomet.ridehailing.model.dto.DriverDTO>> getDriverById(@PathVariable Long id) {
         log.debug("Getting driver: {}", id);
         
-        com.gocomet.ridehailing.model.entity.Driver driver = rideService.getDriverById(id);
+        com.gocomet.ridehailing.model.dto.DriverDTO driver = driverService.getDriverById(id);
         
         return ResponseEntity.ok(ApiResponse.success(driver));
+    }
+    
+    @PostMapping
+    @Trace(dispatcher = true)
+    @Operation(summary = "Create driver", description = "Creates a new driver")
+    public ResponseEntity<ApiResponse<com.gocomet.ridehailing.model.dto.DriverDTO>> createDriver(
+            @Valid @RequestBody com.gocomet.ridehailing.model.dto.CreateDriverRequest request) {
+        log.info("Creating driver: {}", request.getName());
+        com.gocomet.ridehailing.model.dto.DriverDTO driver = driverService.createDriver(request);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponse.success("Driver created successfully", driver));
+    }
+    
+    @PutMapping("/{id}")
+    @Trace(dispatcher = true)
+    @Operation(summary = "Update driver", description = "Updates driver information")
+    public ResponseEntity<ApiResponse<com.gocomet.ridehailing.model.dto.DriverDTO>> updateDriver(
+            @PathVariable Long id,
+            @Valid @RequestBody com.gocomet.ridehailing.model.dto.UpdateDriverRequest request) {
+        log.info("Updating driver: {}", id);
+        com.gocomet.ridehailing.model.dto.DriverDTO driver = driverService.updateDriver(id, request);
+        return ResponseEntity.ok(ApiResponse.success("Driver updated successfully", driver));
     }
     
     @GetMapping("/{id}/pending-rides")

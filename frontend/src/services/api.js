@@ -44,9 +44,11 @@ export const cancelRide = (rideId, reason) => api.post(`/v1/rides/${rideId}/canc
 
 // Driver API
 export const getDriverById = (driverId) => api.get(`/v1/drivers/${driverId}`);
-export const updateDriverLocation = (driverId, location) => 
+export const createDriver = (driverData) => api.post('/v1/drivers', driverData);
+export const updateDriver = (driverId, driverData) => api.put(`/v1/drivers/${driverId}`, driverData);
+export const updateDriverLocation = (driverId, location) =>
   api.post(`/v1/drivers/${driverId}/location`, location);
-export const acceptRide = (driverId, acceptData) => 
+export const acceptRide = (driverId, acceptData) =>
   api.post(`/v1/drivers/${driverId}/accept`, acceptData);
 export const getPendingRides = (driverId) =>
   api.get(`/v1/drivers/${driverId}/pending-rides`);
@@ -54,6 +56,8 @@ export const getRidesByDriverId = (driverId) => api.get(`/v1/rides?driverId=${dr
 
 // Rider API
 export const getRiderById = (riderId) => api.get(`/v1/riders/${riderId}`);
+export const createRider = (riderData) => api.post('/v1/riders', riderData);
+export const updateRider = (riderId, riderData) => api.put(`/v1/riders/${riderId}`, riderData);
 export const getRidesByRiderId = (riderId) => api.get(`/v1/rides?riderId=${riderId}`);
 
 // Trip API

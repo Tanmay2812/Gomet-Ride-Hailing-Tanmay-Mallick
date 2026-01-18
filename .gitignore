@@ -52,6 +52,10 @@ frontend/yarn-error.log*
 # New Relic
 newrelic/logs/
 
+# Environment variables (contains sensitive keys)
+.env
+.env.local
+
 # OS
 .DS_Store
 Thumbs.db
